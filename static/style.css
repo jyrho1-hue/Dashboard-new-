@@ -1,0 +1,45 @@
+/* ── Mobile / Responsive overrides ── */
+
+/* Wrap embedded Plotly / SVG heatmaps so they scroll horizontally on narrow screens */
+.sp500-heatmap-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Momentum-dashboard card table: tighten up on small screens */
+@media (max-width: 767.98px) {
+    /* Shrink momentum/correlation table font */
+    .table {
+        font-size: 0.8rem;
+    }
+
+    /* Tighter cell padding */
+    .table th,
+    .table td {
+        padding: 0.3rem 0.4rem;
+    }
+
+    /* Card body padding */
+    .card-body {
+        padding: 0.5rem;
+    }
+
+    /* Page headings */
+    h1 {
+        font-size: 1.4rem;
+    }
+    h3 {
+        font-size: 1.1rem;
+    }
+
+    /* Heatmap status cell: keep a readable minimum width */
+    .heatmap-cell {
+        min-width: 3rem;
+    }
+
+    /* Reduce outer container padding so tables get full viewport width */
+    .page-container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}

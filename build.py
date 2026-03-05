@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 from types import SimpleNamespace
 
 from jinja2 import Environment, FileSystemLoader
@@ -83,6 +84,15 @@ def build():
         f.write(not_found_html)
 
     print(f"Static site built successfully: {output_path}")
+
+    # Copy static assets (CSS, JS, images) to public/
+    static_src = os.path.join(base_dir, 'static')
+    static_dst = os.path.join(public_dir, 'static')
+    if os.path.isdir(static_src):
+        if os.path.exists(static_dst):
+            shutil.rmtree(static_dst)
+        shutil.copytree(static_src, static_dst)
+        print(f"Static assets copied to: {static_dst}")
 
 
 if __name__ == '__main__':
