@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+
+{% block title %}맞춤 분석{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center mb-4">
+        <h1>맞춤 분석</h1>
+        <p>분석하고 싶은 주식 티커를 쉼표(,)나 공백으로 구분하여 입력하세요.</p>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post">
+                <div class="mb-3">
+                    <textarea name="tickers" class="form-control" rows="4" placeholder="예: TSLA, AAPL, MSFT, NVDA, GOOGL">{{ submitted_tickers }}</textarea>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">분석하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if error_message %}
+        <div class="alert alert-danger">{{ error_message }}</div>
+    {% endif %}
+
+    {% if submitted_tickers and momentum_data %}
+        <div class="card shadow-sm mb-5">
+            <div class="card-header">
+                <h3>📈 모멘텀 히트맵</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>종목</th><th>상태</th>
+                                {% for group_name, periods in momentum_periods.items() %}<th colspan="{{ periods|length }}" class="text-center">{{ group_name }}</th>{% endfor %}
+                            </tr>
+                            <tr>
+                                <th></th><th></th>
+                                {% for group_name, periods in momentum_periods.items() %}{% for period in periods %}<th class="text-center">{{ period }}</th>{% endfor %}{% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in momentum_data %}
+                            <tr>
+                                <td><strong>{{ item.ticker }}</strong></td>
+                                <td class="heatmap-cell {% if item.status == '상승' %}status-bull{% elif item.status == '하락' %}status-bear{% else %}status-corr{% endif %}">{{ item.status }}</td>
+                                {% for group_name, periods in momentum_periods.items() %}
+                                    {% for period in periods %}
+                                        {% set value = item.momentum.get(period) %}
+                                        <td class="text-center" style="background-color: {% if value is not none %}{% set alpha = min(abs(value) / 20, 1) %}{% if value > 0 %}rgba(40, 167, 69, {{ alpha }}){% else %}rgba(220, 53, 69, {{ alpha }}){% endif %}{% else %}#f8f9fa{% endif %}; color: {% if value is not none and (value > 15 or value < -15) %}white{% else %}black{% endif %};">
+                                            {{ '%.2f%%' % value if value is not none else 'N/A' }}
+                                        </td>
+                                    {% endfor %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if submitted_tickers and correlation_plots %}
+        <div class="card shadow-sm">
+            <div class="card-header"><h3>🔗 종목간 상관관계</h3></div>
+            <div class="card-body">
+                <div class="row">
+                    {% for item in correlation_plots %}
+                        <div class="col-lg-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">{{ item.label }} 상관관계</div>
+                                <div class="card-body text-center">
+                                    {% if item.plot_url %}<img src="data:image/png;base64,{{ item.plot_url }}" class="img-fluid">{% elif item.message %}<p class="text-warning p-3">{{ item.message }}</p>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
