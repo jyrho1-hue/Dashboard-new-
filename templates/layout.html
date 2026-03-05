@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}금융 대시보드{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .heatmap-cell { color: white; font-weight: bold; text-align: center; }
+        .status-bull { background-color: #28a745; }
+        .status-bear { background-color: #dc3545; }
+        .status-corr { background-color: #ffc107; color: #333; }
+        .nav-link.active { font-weight: bold; }
+        .page-container { max-width: 1600px; margin: auto; }
+        .table-responsive { max-width: 100%; overflow-x: auto; }
+        th, td { white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">📈 금융 대시보드</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">메인 대시보드</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/custom' %}active{% endif %}" href="/custom">맞춤 분석</a>
+                    </li>
+                </ul>
+            </div>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#alertsModal">
+                        🔔 알림
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="modal fade" id="alertsModal" tabindex="-1" aria-labelledby="alertsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alertsModalLabel">일일 기술적 분석 브리핑</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if alerts_data %}
+                        {% for ticker, data in alerts_data.items() %}
+                            <h4>{{ ticker }}</h4>
+                            <ul class="list-group mb-3">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    종가
+                                    <span class="badge bg-secondary rounded-pill">{{ data.Close }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    RSI(14) <small>(2주 내 다이버전스)</small>
+                                    <span class="badge bg-primary rounded-pill">{{ data.RSI }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    120일 이동평균선
+                                    <span class="badge bg-primary rounded-pill">{{ data['120SMA'] }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    240일 이동평균선
+                                    <span class="badge bg-primary rounded-pill">{{ data['240SMA'] }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    MACD 상태
+                                    <span class="ms-auto">{{ data.MACD_Status }}</span>
+                                </li>
+                            </ul>
+                        {% endfor %}
+                    {% else %}
+                        <p>표시할 알림 데이터가 없습니다.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container-fluid page-container mt-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="text-center text-muted py-4">
+        <p>&copy; 2025 Financial Dashboard</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
