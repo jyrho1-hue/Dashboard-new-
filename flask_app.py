@@ -1,5 +1,6 @@
 import base64
 import io
+import os
 from datetime import datetime, timedelta
 import json
 import matplotlib
@@ -21,7 +22,8 @@ app.jinja_env.globals['min'] = min
 def index():
     """메인 페이지. 미리 생성된 JSON 데이터를 읽어와 보여줍니다."""
     try:
-        with open('/home/jyrho95/dashboard_data.json', 'r', encoding='utf-8') as f:
+        data_path = os.path.join(os.path.dirname(__file__), 'dashboard_data.json')
+        with open(data_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
     except FileNotFoundError:
         return "데이터 파일(dashboard_data.json)을 찾을 수 없습니다. 먼저 update_data.py를 실행해주세요.", 404
