@@ -55,6 +55,33 @@ def build():
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(rendered)
 
+    # Prevent GitHub Pages from processing files with Jekyll
+    nojekyll_path = os.path.join(public_dir, '.nojekyll')
+    open(nojekyll_path, 'w').close()
+
+    # Generate a 404 fallback page
+    not_found_html = """\
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 – 페이지를 찾을 수 없습니다</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center" style="min-height:100vh;">
+  <div class="text-center">
+    <h1 class="display-1 fw-bold text-muted">404</h1>
+    <p class="fs-4">요청하신 페이지를 찾을 수 없습니다.</p>
+    <a href="/" class="btn btn-primary mt-3">대시보드 홈으로 돌아가기</a>
+  </div>
+</body>
+</html>
+"""
+    not_found_path = os.path.join(public_dir, '404.html')
+    with open(not_found_path, 'w', encoding='utf-8') as f:
+        f.write(not_found_html)
+
     print(f"Static site built successfully: {output_path}")
 
 
